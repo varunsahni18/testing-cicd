@@ -3,3 +3,4 @@ fastapi
 pytest
 pytest-xdist
 uvicorn
+httpx
