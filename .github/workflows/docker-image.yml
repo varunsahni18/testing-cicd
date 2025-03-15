@@ -35,11 +35,11 @@ jobs:
 
       - name: Run Docker Container
         run: |
-          docker run -d --name test-container -p 8000:8000 my-fastapi-app:latest
+          docker run -d --name test-container -p 8200:8200 my-fastapi-app:latest
 
       - name: Run Integration Tests on Docker Container
         env:
-          BASE_URL: http://localhost:8000
+          BASE_URL: http://localhost:8200
         run: |
           # The test file will use the BASE_URL environment variable and wait for the container to be ready.
           pytest test_endpoints.py
