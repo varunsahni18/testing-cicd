@@ -1,0 +1,51 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Local Tests
+        run: |
+          # Run tests using TestClient (integration mode off since BASE_URL is not set)
+          pytest test_endpoints.py
+
+      - name: Build Docker Image
+        run: |
+          docker build -t my-fastapi-app:latest .
+
+      - name: Run Docker Container
+        run: |
+          docker run -d --name test-container -p 8000:8000 my-fastapi-app:latest
+
+      - name: Run Integration Tests on Docker Container
+        env:
+          BASE_URL: http://localhost:8000
+        run: |
+          # The test file will use the BASE_URL environment variable and wait for the container to be ready.
+          pytest test_endpoints.py
+
+      - name: Stop Docker Container
+        run: |
+          docker stop test-container
+          docker rm test-container
+
