@@ -1,0 +1,5 @@
+requests
+fastapi
+pytest
+pytest-xdist
+uvicorn
